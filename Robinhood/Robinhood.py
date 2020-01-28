@@ -751,12 +751,15 @@ class Robinhood:
         return self.session.get(instrument).json()['symbol']
 
 
-    def watchlists(self): 
-        """Returns list of securities' symbols that the user has in watchlist
-            Returns:
-                (:object: `dict`): Non-zero positions
+    def watchlists(self, basic = True): 
+        """Returns list of instruments tracked in user watchlist
+            for basic = True (legacy condition), returns instrument endpoints with metadata.
+            for basic = False, returns full symbol information for each security
         """
-        return self.session.get(endpoints.watchlists() + 'Default/', timeout=15).json()
+        if(basic):
+            return self.session.get(endpoints.watchlists() + 'Default/', timeout=15).json()
+        else:
+            return [requests.get(each['instrument']).json() for each in self.session.get(endpoints.watchlists() + 'Default/', timeout=15).json()['results']]
 
     ###########################################################################
     #                           GET OPTIONS INFO
